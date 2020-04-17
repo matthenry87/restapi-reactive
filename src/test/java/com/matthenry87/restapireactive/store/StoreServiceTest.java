@@ -6,8 +6,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
 class StoreServiceTest {
 
@@ -21,9 +19,16 @@ class StoreServiceTest {
     @Test
     void getStore() {
         // Arrange
-        Mono<StoreEntity> store = storeService.getStore("1");
+        StoreEntity store1 = new StoreEntity();
+        store1.setName("name");
 
-//      StepVerifier.create(store)
+        Mono<StoreEntity> createdStore = storeService.createStore(store1)
+        .flatMap(x -> storeService.getStore(x.getName()));
 
+        // Act/Assert
+        StepVerifier.create(createdStore)
+                .expectNextMatches(x -> x.getName().equals(store1.getName()))
+                .verifyComplete();
     }
+
 }
