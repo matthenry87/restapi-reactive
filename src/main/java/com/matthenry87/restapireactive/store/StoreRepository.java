@@ -9,4 +9,6 @@ public interface StoreRepository extends ReactiveMongoRepository<StoreEntity, St
 
     Mono<StoreEntity> findByName(String name);
 
+    Mono<StoreEntity> findByNameAndIdNot(String name, String id);
+
 }

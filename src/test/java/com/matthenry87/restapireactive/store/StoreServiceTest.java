@@ -23,7 +23,7 @@ class StoreServiceTest {
         store1.setName("name");
 
         Mono<StoreEntity> createdStore = storeService.createStore(store1)
-        .flatMap(x -> storeService.getStore(x.getName()));
+        .flatMap(x -> storeService.getStore(x.getId()));
 
         // Act/Assert
         StepVerifier.create(createdStore)
