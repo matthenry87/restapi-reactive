@@ -16,7 +16,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -29,13 +28,13 @@ class StoreControllerTest {
     private StoreService storeService;
 
     @Autowired
-    private WebTestClient webClient;
-
-    @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private WebTestClient webClient;
+
     @Test
-    void get() {
+    void get_works() {
         // Arrange
         when(storeService.getStores()).thenReturn(Flux.just(new StoreEntity(), new StoreEntity()));
 
@@ -64,29 +63,6 @@ class StoreControllerTest {
     }
 
     @Test
-    void getById_throwsNotFoundException_whenStoreNotFound() { // TODO Move to ExceptionHndlerTest
-        // Arrange
-        when(storeService.getStore("id")).thenThrow(NotFoundException.class);
-
-        // Act/Assert
-        webClient.get().uri("/store/id")
-                .exchange()
-                .expectStatus().isNotFound();
-    }
-
-    @Test
-    void get_() {
-        // Arrange
-        when(storeService.getStores()).thenThrow(AlreadyExistsException.class);
-
-        // Act/Assert
-        webClient.get()
-                .uri("/store")
-                .exchange()
-                .expectStatus().isBadRequest();
-    }
-
-    @Test
     void post_works() throws JsonProcessingException {
         // Arrange
         StoreModel storeModel = createStoreModel();
@@ -108,7 +84,7 @@ class StoreControllerTest {
     }
 
     @Test
-    void put() throws JsonProcessingException {
+    void put_works() throws JsonProcessingException {
         // Arrange
         StoreModel storeModel = createStoreModel();
 
@@ -129,7 +105,7 @@ class StoreControllerTest {
     }
 
     @Test
-    void delete() {
+    void delete_works() {
         // Arrange
          when(storeService.deleteStore("id")).thenReturn(Mono.empty());
 
