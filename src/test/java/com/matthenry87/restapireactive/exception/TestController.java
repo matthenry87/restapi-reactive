@@ -29,18 +29,6 @@ class TestController {
         return Mono.just("lalala");
     }
 
-    @PutMapping
-    public Mono<Object> constraintViolationException() {
-
-        ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
-
-        Validator validator = validatorFactory.getValidator();
-
-        Set<ConstraintViolation<Pojo>> constraintViolations = validator.validate(new Pojo());
-
-        throw new ConstraintViolationException(constraintViolations);
-    }
-
 }
 
 @Getter

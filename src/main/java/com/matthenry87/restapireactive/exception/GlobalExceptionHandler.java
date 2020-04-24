@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.springframework.core.codec.DecodingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,11 +12,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.server.ServerWebInputException;
+import org.springframework.web.server.UnsupportedMediaTypeStatusException;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,7 +36,7 @@ public class GlobalExceptionHandler {
             }
         }
 
-        throw e;
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(WebExchangeBindException.class)
@@ -51,24 +47,6 @@ public class GlobalExceptionHandler {
         List<Error> errors = fieldErrors.stream()
                 .map(x -> new Error(x.getField(), x.getDefaultMessage()))
                 .collect(Collectors.toList());
-
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<List<Error>> constraintViolationException(ConstraintViolationException e) {
-
-        List<Error> errors = new ArrayList<>();
-
-        for (ConstraintViolation<?> constraintViolation : e.getConstraintViolations()) {
-
-            Path propertyPath = constraintViolation.getPropertyPath();
-
-            String name = ((PathImpl) propertyPath).getLeafNode().getName();
-            String message = constraintViolation.getMessage();
-
-            errors.add(new Error(name, message));
-        }
 
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
@@ -91,13 +69,19 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(UnsupportedMediaTypeStatusException.class)
+    public ResponseEntity<Error> unsupportedMediaTypeStatusException(UnsupportedMediaTypeStatusException e) {
+
+        Error error = new Error(null, e.getMessage());
+
+        return new ResponseEntity<>(error, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Error> exception(Exception e) {
 
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-    // TODO UnsupportedMediaTypeStatusException
 
     private ResponseEntity<Error> processInvalidFormatException(InvalidFormatException invalidFormatException) {
 
@@ -118,7 +102,7 @@ public class GlobalExceptionHandler {
 
             return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
         }
-        return null;
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @Getter

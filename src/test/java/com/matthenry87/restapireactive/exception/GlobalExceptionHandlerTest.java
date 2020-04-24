@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -27,23 +28,34 @@ class GlobalExceptionHandlerTest {
     private WebTestClient webClient;
 
     @Test
-    void serverWebInputException() {
+    void serverWebInputException() throws JsonProcessingException {
+        // Arrange
+        Pojo pojo = createPojo();
+
+        String json = objectMapper.writeValueAsString(pojo).replace("OPEN", "FOO");
+
+        // Act/Assert
+        webClient.post().uri("/test")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(json)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Test
     void webExchangeBindException() {
-    }
-
-    @Test
-    void constraintViolationException() {
+        // Arrange/Act/Assert
+        webClient.post().uri("/test")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("{}")
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     @Test
     void notFoundException() throws JsonProcessingException {
         // Arrange
-        Pojo pojo = createPojo();
-
-        String json = objectMapper.writeValueAsString(pojo);
+        String json = getJson();
 
         when(mock.foo()).thenThrow(NotFoundException.class);
 
@@ -58,9 +70,7 @@ class GlobalExceptionHandlerTest {
     @Test
     void alreadyExistsException() throws JsonProcessingException {
         // Arrange
-        Pojo pojo = createPojo();
-
-        String json = objectMapper.writeValueAsString(pojo);
+        String json = getJson();
 
         when(mock.foo()).thenThrow(AlreadyExistsException.class);
 
@@ -73,7 +83,32 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void exception() {
+    void unsupportedMediaTypeStatusException() throws JsonProcessingException {
+        // Arrange
+        String json = getJson();
+
+        when(mock.foo()).thenThrow(AlreadyExistsException.class);
+
+        // Act/Assert
+        webClient.post().uri("/test")
+                .contentType(MediaType.TEXT_PLAIN)
+                .exchange()
+                .expectStatus().value(is(415));
+    }
+
+    @Test
+    void exception() throws JsonProcessingException {
+        // Arrange
+        String json = getJson();
+
+        when(mock.foo()).thenThrow(new RuntimeException());
+
+        // Act/Assert
+        webClient.post().uri("/test")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(json)
+                .exchange()
+                .expectStatus().is5xxServerError();
     }
 
     private Pojo createPojo() {
@@ -81,6 +116,12 @@ class GlobalExceptionHandlerTest {
         pojo.setFoo("foo");
         pojo.setStatus(Status.OPEN);
         return pojo;
+    }
+
+    private String getJson() throws JsonProcessingException {
+        Pojo pojo = createPojo();
+
+        return objectMapper.writeValueAsString(pojo);
     }
 
 }
