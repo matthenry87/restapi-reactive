@@ -2,30 +2,36 @@ package com.matthenry87.restapireactive.exception;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
-@WebFluxTest(controllers = TestController.class)
 class GlobalExceptionHandlerTest {
 
-    @MockBean
+    @Mock
     private Pojo mock;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Autowired
     private WebTestClient webClient;
+
+    @BeforeEach
+    void init() {
+
+        MockitoAnnotations.initMocks(this);
+
+        TestController testController = new TestController(mock);
+
+        webClient = WebTestClient.bindToController(testController)
+                .controllerAdvice(GlobalExceptionHandler.class)
+                .build();
+    }
 
     @Test
     void serverWebInputException() throws JsonProcessingException {

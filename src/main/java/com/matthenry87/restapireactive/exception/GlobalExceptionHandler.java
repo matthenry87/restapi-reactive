@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.server.ServerWebInputException;
 import org.springframework.web.server.UnsupportedMediaTypeStatusException;
+import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ServerWebInputException.class)
-    public ResponseEntity<Error> serverWebInputException(ServerWebInputException e) {
+    public Mono<ResponseEntity<Error>> serverWebInputException(ServerWebInputException e) {
 
         Throwable cause = e.getCause();
 
@@ -32,15 +33,17 @@ public class GlobalExceptionHandler {
 
             if (cause1 instanceof InvalidFormatException) {
 
-                return processInvalidFormatException((InvalidFormatException) cause1);
+                return Mono.just(processInvalidFormatException((InvalidFormatException) cause1));
             }
         }
 
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Error error = new Error(null, e.getMessage());
+
+        return Mono.just(new ResponseEntity<>(error, HttpStatus.BAD_REQUEST));
     }
 
     @ExceptionHandler(WebExchangeBindException.class)
-    public ResponseEntity<List<Error>> webExchangeBindException(WebExchangeBindException e) {
+    public Mono<ResponseEntity<List<Error>>> webExchangeBindException(WebExchangeBindException e) {
 
         List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors();
 
@@ -48,39 +51,39 @@ public class GlobalExceptionHandler {
                 .map(x -> new Error(x.getField(), x.getDefaultMessage()))
                 .collect(Collectors.toList());
 
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        return Mono.just(new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST));
     }
 
     @ExceptionHandler
-    public ResponseEntity<Error> alreadyExistsException(AlreadyExistsException e) {
+    public Mono<ResponseEntity<Error>> alreadyExistsException(AlreadyExistsException e) {
 
         String message = e.getMessage();
 
         Error error = new Error(null, message == null ? "already exists" : message);
 
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        return Mono.just(new ResponseEntity<>(error, HttpStatus.BAD_REQUEST));
     }
 
     @ExceptionHandler
-    public ResponseEntity<Error> notFoundException(NotFoundException e) {
+    public Mono<ResponseEntity<Error>> notFoundException(NotFoundException e) {
 
         Error error = new Error(null, "not found");
 
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        return Mono.just(new ResponseEntity<>(error, HttpStatus.NOT_FOUND));
     }
 
     @ExceptionHandler(UnsupportedMediaTypeStatusException.class)
-    public ResponseEntity<Error> unsupportedMediaTypeStatusException(UnsupportedMediaTypeStatusException e) {
+    public Mono<ResponseEntity<Error>> unsupportedMediaTypeStatusException(UnsupportedMediaTypeStatusException e) {
 
         Error error = new Error(null, e.getMessage());
 
-        return new ResponseEntity<>(error, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+        return Mono.just(new ResponseEntity<>(error, HttpStatus.UNSUPPORTED_MEDIA_TYPE));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Error> exception(Exception e) {
+    public Mono<ResponseEntity<Error>> exception(Exception e) {
 
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        return Mono.just(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
     }
 
     private ResponseEntity<Error> processInvalidFormatException(InvalidFormatException invalidFormatException) {

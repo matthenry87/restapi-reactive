@@ -52,10 +52,9 @@ public class StoreController {
     public Mono<StoreModel> put(@RequestBody @Validated(UpdateStore.class) StoreModel storeModel,
                                 @PathVariable String id) {
 
-        StoreEntity storeEntity = storeMapper.toEntity(storeModel);
-
-        storeEntity.setId(id);
         storeModel.setId(id);
+
+        StoreEntity storeEntity = storeMapper.toEntity(storeModel);
 
         return storeService.updateStore(storeEntity)
                 .map(x -> storeModel);
