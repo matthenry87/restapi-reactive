@@ -97,6 +97,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    // TODO UnsupportedMediaTypeStatusException
+
     private ResponseEntity<Error> processInvalidFormatException(InvalidFormatException invalidFormatException) {
 
         Class<?> targetType = invalidFormatException.getTargetType();
