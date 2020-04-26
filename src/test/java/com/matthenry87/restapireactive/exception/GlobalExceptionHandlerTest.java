@@ -26,7 +26,7 @@ class GlobalExceptionHandlerTest {
 
         MockitoAnnotations.initMocks(this);
 
-        TestController testController = new TestController(mock);
+        var testController = new TestController(mock);
 
         webClient = WebTestClient.bindToController(testController)
                 .controllerAdvice(GlobalExceptionHandler.class)
@@ -36,9 +36,9 @@ class GlobalExceptionHandlerTest {
     @Test
     void serverWebInputException() throws JsonProcessingException {
         // Arrange
-        Pojo pojo = createPojo();
+        var pojo = createPojo();
 
-        String json = objectMapper.writeValueAsString(pojo).replace("OPEN", "FOO");
+        var json = objectMapper.writeValueAsString(pojo).replace("OPEN", "FOO");
 
         // Act/Assert
         webClient.post().uri("/test")
@@ -61,7 +61,7 @@ class GlobalExceptionHandlerTest {
     @Test
     void notFoundException() throws JsonProcessingException {
         // Arrange
-        String json = getJson();
+        var json = getJson();
 
         when(mock.foo()).thenThrow(NotFoundException.class);
 
@@ -76,7 +76,7 @@ class GlobalExceptionHandlerTest {
     @Test
     void alreadyExistsException() throws JsonProcessingException {
         // Arrange
-        String json = getJson();
+        var json = getJson();
 
         when(mock.foo()).thenThrow(AlreadyExistsException.class);
 
@@ -89,10 +89,8 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void unsupportedMediaTypeStatusException() throws JsonProcessingException {
+    void unsupportedMediaTypeStatusException() {
         // Arrange
-        String json = getJson();
-
         when(mock.foo()).thenThrow(AlreadyExistsException.class);
 
         // Act/Assert
@@ -105,7 +103,7 @@ class GlobalExceptionHandlerTest {
     @Test
     void exception() throws JsonProcessingException {
         // Arrange
-        String json = getJson();
+        var json = getJson();
 
         when(mock.foo()).thenThrow(new RuntimeException());
 
@@ -118,14 +116,17 @@ class GlobalExceptionHandlerTest {
     }
 
     private Pojo createPojo() {
-        Pojo pojo = new Pojo();
+
+        var pojo = new Pojo();
         pojo.setFoo("foo");
         pojo.setStatus(Status.OPEN);
+
         return pojo;
     }
 
     private String getJson() throws JsonProcessingException {
-        Pojo pojo = createPojo();
+
+        var pojo = createPojo();
 
         return objectMapper.writeValueAsString(pojo);
     }

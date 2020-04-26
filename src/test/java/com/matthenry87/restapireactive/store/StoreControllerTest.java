@@ -30,7 +30,7 @@ class StoreControllerTest {
 
         StoreMapper storeMapper = new StoreMapperImpl();
 
-        StoreController storeController = new StoreController(storeService, storeMapper);
+        var storeController = new StoreController(storeService, storeMapper);
 
         webClient = WebTestClient.bindToController(storeController).build();
     }
@@ -52,7 +52,7 @@ class StoreControllerTest {
     @Test
     void getById_works() {
         // Arrange
-        StoreEntity storeEntity = createStoreEntity();
+        var storeEntity = createStoreEntity();
 
         when(storeService.getStore("id")).thenReturn(Mono.just(storeEntity));
 
@@ -67,11 +67,11 @@ class StoreControllerTest {
     @Test
     void post_works() throws JsonProcessingException {
         // Arrange
-        StoreModel storeModel = createStoreModel();
+        var storeModel = createStoreModel();
 
-        String json = objectMapper.writeValueAsString(storeModel);
+        var json = objectMapper.writeValueAsString(storeModel);
 
-        StoreEntity storeEntity = createStoreEntity();
+        var storeEntity = createStoreEntity();
 
         when(storeService.createStore(any(StoreEntity.class))).thenReturn(Mono.just(storeEntity));
 
@@ -88,11 +88,11 @@ class StoreControllerTest {
     @Test
     void put_works() throws JsonProcessingException {
         // Arrange
-        StoreModel storeModel = createStoreModel();
+        var storeModel = createStoreModel();
 
-        String json = objectMapper.writeValueAsString(storeModel);
+        var json = objectMapper.writeValueAsString(storeModel);
 
-        StoreEntity storeEntity = createStoreEntity();
+        var storeEntity = createStoreEntity();
 
         when(storeService.updateStore(any(StoreEntity.class))).thenReturn(Mono.just(storeEntity));
 
@@ -120,7 +120,7 @@ class StoreControllerTest {
 
     private StoreEntity createStoreEntity() {
 
-        StoreEntity storeEntity = new StoreEntity();
+        var storeEntity = new StoreEntity();
 
         storeEntity.setName("Store Name");
         storeEntity.setAddress("123 High St");
@@ -132,7 +132,7 @@ class StoreControllerTest {
 
     private StoreModel createStoreModel() {
 
-        StoreModel storeModel = new StoreModel();
+        var storeModel = new StoreModel();
 
         storeModel.setName("Store Name");
         storeModel.setAddress("123 High St");

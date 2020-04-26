@@ -36,7 +36,7 @@ public class StoreController {
     @PostMapping
     public Mono<ResponseEntity<StoreModel>> post(@RequestBody @Validated(CreateStore.class) StoreModel storeModel) {
 
-        StoreEntity storeEntity = storeMapper.toEntity(storeModel);
+        var storeEntity = storeMapper.toEntity(storeModel);
 
         return storeService.createStore(storeEntity)
                 .map(x -> {
@@ -54,7 +54,7 @@ public class StoreController {
 
         storeModel.setId(id);
 
-        StoreEntity storeEntity = storeMapper.toEntity(storeModel);
+        var storeEntity = storeMapper.toEntity(storeModel);
 
         return storeService.updateStore(storeEntity)
                 .map(x -> storeModel);

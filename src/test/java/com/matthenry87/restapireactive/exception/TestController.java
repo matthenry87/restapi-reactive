@@ -4,12 +4,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
-import javax.validation.*;
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/test")
@@ -48,5 +50,5 @@ class Pojo {
 
 enum Status {
 
-    OPEN, CLOSED
+    OPEN
 }

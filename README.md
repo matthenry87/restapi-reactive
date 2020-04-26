@@ -51,7 +51,7 @@ Historically, your typical package structure has looked like this:
 
 A structure like the one above means that changes usually end up spanning multiple packages. Instead, I prefer to have 
 a package for each feature group or bounded context. The repository, service, controller, and all related files live in 
-the same package which helps with readability and a step toward isolated (loosely coupled, highly cohesive) components.
+the same package which helps with readability, and a step toward isolated (loosely coupled, highly cohesive) components.
 Most methods can also be package protected instead of public forcing us to be explicit about what we need to expose to 
 other parts of the application. This structure also makes it much easier to break out a microservice if/when this is 
 deemed necessary.

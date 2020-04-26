@@ -42,7 +42,7 @@ class StoreService {
 
     Mono<StoreEntity> updateStore(StoreEntity storeEntity) {
 
-        String id = storeEntity.getId();
+        var id = storeEntity.getId();
 
         return storeRepository.findById(id)
                 .switchIfEmpty(Mono.error(new NotFoundException()))

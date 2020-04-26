@@ -5,8 +5,6 @@ import com.matthenry87.restapireactive.exception.NotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @SpringBootTest
@@ -21,13 +19,13 @@ class StoreServiceTest {
     @Test
     void getStores_works() {
         // Arrange
-        StoreEntity store1 = new StoreEntity();
+        var store1 = new StoreEntity();
         store1.setName("name");
 
-        StoreEntity store2 = new StoreEntity();
+        var store2 = new StoreEntity();
         store2.setName("name2");
 
-        Flux<StoreEntity> createdStore = storeRepository.deleteAll()
+        var createdStore = storeRepository.deleteAll()
                 .then(storeRepository.save(store1))
                 .then(storeRepository.save(store2))
                 .thenMany(storeService.getStores());
@@ -42,10 +40,10 @@ class StoreServiceTest {
     @Test
     void getStore_works() {
         // Arrange
-        StoreEntity store1 = new StoreEntity();
+        var store1 = new StoreEntity();
         store1.setName("name");
 
-        Mono<StoreEntity> createdStore = storeRepository.deleteAll()
+        var createdStore = storeRepository.deleteAll()
                 .then(storeRepository.save(store1))
                 .flatMap(x -> storeService.getStore(x.getId()));
 
@@ -58,7 +56,7 @@ class StoreServiceTest {
     @Test
     void getStore_returnsNotFoundException_whenNotFound() {
         // Arrange
-        Mono<StoreEntity> storeNotFound = storeRepository.deleteAll()
+        var storeNotFound = storeRepository.deleteAll()
                 .then(storeService.getStore("foo"));
 
         // Act/Assert
@@ -70,10 +68,10 @@ class StoreServiceTest {
     @Test
     void createStore_works() {
         // Arrange
-        StoreEntity store1 = new StoreEntity();
+        var store1 = new StoreEntity();
         store1.setName("name");
 
-        Mono<StoreEntity> createdStore = storeRepository.deleteAll()
+        var createdStore = storeRepository.deleteAll()
                 .then(storeService.createStore(store1))
                 .flatMap(x -> storeRepository.findById(x.getId()));
 
@@ -86,10 +84,10 @@ class StoreServiceTest {
     @Test
     void createStore_ThrowsAlreadyExistsException_whenAlreadyExists() {
         // Arrange
-        StoreEntity store1 = new StoreEntity();
+        var store1 = new StoreEntity();
         store1.setName("name");
 
-        Mono<StoreEntity> createdStore = storeRepository.deleteAll()
+        var createdStore = storeRepository.deleteAll()
                 .then(storeService.createStore(store1))
                 .then(storeService.createStore(store1));
 
@@ -102,10 +100,10 @@ class StoreServiceTest {
     @Test
     void updateStore_works() {
         // Arrange
-        StoreEntity store1 = new StoreEntity();
+        var store1 = new StoreEntity();
         store1.setName("name");
 
-        Mono<StoreEntity> createdStore = storeRepository.deleteAll()
+        var createdStore = storeRepository.deleteAll()
                 .then(storeRepository.save(store1))
                 .flatMap(x -> {
                     store1.setId(x.getId());
@@ -121,13 +119,13 @@ class StoreServiceTest {
     @Test
     void updateStore_ThrowAlreadyExistsException_whenStoreWithNameAlreadyExists() {
         // Arrange
-        StoreEntity store1 = new StoreEntity();
+        var store1 = new StoreEntity();
         store1.setName("name");
 
-        StoreEntity store2 = new StoreEntity();
+        var store2 = new StoreEntity();
         store2.setName("name2");
 
-        Mono<StoreEntity> createdStore = storeRepository.deleteAll()
+        var createdStore = storeRepository.deleteAll()
                 .then(storeRepository.save(store1))
                 .then(storeRepository.save(store2))
                 .flatMap(x -> {
@@ -145,10 +143,10 @@ class StoreServiceTest {
     @Test
     void deleteStore_works() {
         // Arrange
-        StoreEntity store1 = new StoreEntity();
+        var store1 = new StoreEntity();
         store1.setName("name");
 
-        Mono<Void> voidMono = storeRepository.deleteAll()
+        var voidMono = storeRepository.deleteAll()
                 .then(storeRepository.save(store1))
                 .flatMap(x -> storeService.deleteStore(x.getId()));
 
@@ -161,10 +159,10 @@ class StoreServiceTest {
     @Test
     void deleteStore_ThrowsNotFoundException_whenStoreNotFound() {
         // Arrange
-        StoreEntity store1 = new StoreEntity();
+        var store1 = new StoreEntity();
         store1.setId("id");
 
-        Mono<Void> voidMono = storeRepository.deleteAll()
+        var voidMono = storeRepository.deleteAll()
                 .then(storeService.deleteStore(store1.getId()));
 
         // Act/Assert

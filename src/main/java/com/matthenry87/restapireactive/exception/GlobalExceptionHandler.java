@@ -7,7 +7,6 @@ import lombok.Getter;
 import org.springframework.core.codec.DecodingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.support.WebExchangeBindException;
@@ -25,11 +24,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ServerWebInputException.class)
     public Mono<ResponseEntity<Error>> serverWebInputException(ServerWebInputException e) {
 
-        Throwable cause = e.getCause();
+        var cause = e.getCause();
 
         if (cause instanceof DecodingException) {
 
-            Throwable cause1 = cause.getCause();
+            var cause1 = cause.getCause();
 
             if (cause1 instanceof InvalidFormatException) {
 
@@ -37,7 +36,7 @@ public class GlobalExceptionHandler {
             }
         }
 
-        Error error = new Error(null, e.getMessage());
+        var error = new Error(null, e.getMessage());
 
         return Mono.just(new ResponseEntity<>(error, HttpStatus.BAD_REQUEST));
     }
@@ -45,9 +44,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(WebExchangeBindException.class)
     public Mono<ResponseEntity<List<Error>>> webExchangeBindException(WebExchangeBindException e) {
 
-        List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors();
+        var fieldErrors = e.getBindingResult().getFieldErrors();
 
-        List<Error> errors = fieldErrors.stream()
+        var errors = fieldErrors.stream()
                 .map(x -> new Error(x.getField(), x.getDefaultMessage()))
                 .collect(Collectors.toList());
 
@@ -57,9 +56,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler
     public Mono<ResponseEntity<Error>> alreadyExistsException(AlreadyExistsException e) {
 
-        String message = e.getMessage();
+        var message = e.getMessage();
 
-        Error error = new Error(null, message == null ? "already exists" : message);
+        var error = new Error(null, message == null ? "already exists" : message);
 
         return Mono.just(new ResponseEntity<>(error, HttpStatus.BAD_REQUEST));
     }
@@ -67,7 +66,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler
     public Mono<ResponseEntity<Error>> notFoundException(NotFoundException e) {
 
-        Error error = new Error(null, "not found");
+        var error = new Error(null, "not found");
 
         return Mono.just(new ResponseEntity<>(error, HttpStatus.NOT_FOUND));
     }
@@ -75,7 +74,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnsupportedMediaTypeStatusException.class)
     public Mono<ResponseEntity<Error>> unsupportedMediaTypeStatusException(UnsupportedMediaTypeStatusException e) {
 
-        Error error = new Error(null, e.getMessage());
+        var error = new Error(null, e.getMessage());
 
         return Mono.just(new ResponseEntity<>(error, HttpStatus.UNSUPPORTED_MEDIA_TYPE));
     }
@@ -88,20 +87,20 @@ public class GlobalExceptionHandler {
 
     private ResponseEntity<Error> processInvalidFormatException(InvalidFormatException invalidFormatException) {
 
-        Class<?> targetType = invalidFormatException.getTargetType();
+        var targetType = invalidFormatException.getTargetType();
 
         if (Enum.class.isAssignableFrom(targetType)) {
 
-            Enum[] enumConstants = (Enum[]) targetType.getEnumConstants();
+            var enumConstants = (Enum[]) targetType.getEnumConstants();
 
-            String values = Arrays.stream(enumConstants)
+            var values = Arrays.stream(enumConstants)
                     .map(Enum::name)
                     .collect(Collectors.joining(", "));
 
-            String message  = "Invalid value. Valid values: " + values;
-            String field = invalidFormatException.getPath().get(0).getFieldName();
+            var message  = "Invalid value. Valid values: " + values;
+            var field = invalidFormatException.getPath().get(0).getFieldName();
 
-            Error error = new Error(field, message);
+            var error = new Error(field, message);
 
             return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
         }
